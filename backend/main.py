@@ -37,7 +37,7 @@ app = FastAPI(title="CloudArchitect AI", version="1.0.0")
 # CORS: adjust allow_origins for your deployed frontend URL(s).
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten this to your frontend's deployed origin before going to prod
+    allow_origins=["https://multi-agent-cloud-architect-ai.vercel.app"],  # tighten this to your frontend's deployed origin before going to prod
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
