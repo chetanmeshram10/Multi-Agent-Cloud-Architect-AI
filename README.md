@@ -1,26 +1,136 @@
+<div align="center">
+
 # CloudArchitect AI
 
-A multi-agent system that turns a plain-English project brief into an AWS architecture,
-an independent Well-Architected review, apply-ready Terraform, and a monthly cost estimate.
+### A multi-agent system that designs, reviews, provisions, and prices AWS architecture — from a single sentence.
 
-```
-Requirements Analyst → Solutions Architect → Reviewer ⇄ (revise) → DevOps ⇄ (retry) → FinOps
-```
+[![Live Demo](https://img.shields.io/badge/Live_Demo-multi--agent--cloud--architect--ai.vercel.app-E8A33D?style=for-the-badge&logo=vercel&logoColor=white)](https://multi-agent-cloud-architect-ai.vercel.app/)
 
-Built with **LangGraph** (orchestration), **Groq** (LLM inference), **FastAPI** (backend API),
-and **React + Tailwind** (frontend).
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![LangGraph](https://img.shields.io/badge/LangGraph-Orchestration-1C3C3C?style=flat-square)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-Inference-F55036?style=flat-square)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?style=flat-square&logo=terraform&logoColor=white)
+
+</div>
 
 ---
 
-## ⚠️ Rotate your Groq API key first
+## What it does
 
-An earlier Groq key was pasted directly into a Cursor chat transcript that got shared for this
-build. Treat that key as compromised — rotate it now at
-[console.groq.com](https://console.groq.com/keys) before doing anything else, then put the new
-key in `backend/.env` (never in code, never in chat) as:
+Describe a workload in plain English — *"An internal analytics dashboard for a 40-person startup, low budget"* — and five specialist AI agents take it from there, live, in front of you:
 
 ```
-GROQ_API_KEY=your_new_key_here
+Requirements Analyst → Solutions Architect → Reviewer ⇄ (revises) → DevOps ⇄ (retries) → FinOps
+```
+
+Each agent has one job, hands its output to the next, and the pipeline includes two real feedback loops — not just a linear chain:
+
+- The **Reviewer** independently scores the design against all six AWS Well-Architected Framework pillars and sends it back to the **Architect** for revision if it doesn't meet the bar.
+- **DevOps** validates its own generated Terraform and regenerates automatically if validation fails.
+
+By the end, you have a complete architecture design, an independent WAF review with a numeric score, apply-ready Terraform, and a line-item monthly cost estimate — all from one sentence.
+
+**[→ Try the live demo](https://multi-agent-cloud-architect-ai.vercel.app/)**
+
+---
+
+## See it in action
+
+<div align="center">
+
+### The pipeline, live
+*Five agents visualized as an animated trace — watch each one run, including the revision loop when the Reviewer sends work back to the Architect.*
+
+![Pipeline trace showing all five agents complete](./docs/screenshots/01-hero-pipeline-trace.png)
+
+<br>
+
+### Independent architecture review
+*The Reviewer doesn't just rubber-stamp the design — it scores all six Well-Architected Framework pillars independently and explains its reasoning.*
+
+![Review tab showing WAF score and pillar breakdown](./docs/screenshots/02-review-waf-score.png)
+
+<br>
+
+### Full architecture, explained
+*Every service comes with its purpose and which WAF pillar it serves — not just a service list, but the reasoning behind it.*
+
+![Architecture tab showing service-by-service breakdown](./docs/screenshots/03-architecture-design.png)
+
+<br>
+
+### Real cost estimates, line by line
+*FinOps breaks down monthly cost per service with the actual pricing assumptions it used — not a single guessed number.*
+
+![Cost tab showing per-service monthly breakdown](./docs/screenshots/04-cost-breakdown.png)
+
+<br>
+
+### Apply-ready Terraform
+*DevOps generates and self-validates complete HCL — every resource tagged and traceable back to the architecture above.*
+
+![Terraform tab showing generated HCL and validation status](./docs/screenshots/05-terraform-output.png)
+
+</div>
+
+---
+
+## How the pipeline is orchestrated
+
+Built with **LangGraph** as a real stateful graph, not a fixed sequence of function calls:
+
+- **Revision loop** — if the Reviewer doesn't approve the design, the Architect receives the specific required changes and produces a new revision, up to 3 passes, so it never stalls indefinitely.
+- **Terraform retry loop** — if generated HCL fails self-validation (brace balance, required provider blocks, no placeholder text, at least one real resource), DevOps regenerates, up to 2 retries.
+- Every node reports progress through a callback, streamed to the frontend as Server-Sent Events — so the UI shows live per-agent status instead of one long spinner.
+
+```mermaid
+flowchart LR
+    A[Requirements Analyst] --> B[Solutions Architect]
+    B --> C[Reviewer]
+    C -->|approved| D[DevOps]
+    C -->|changes requested| B
+    D -->|validation passed| E[FinOps]
+    D -->|validation failed| D
+    E --> F[Done]
+```
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| **Orchestration** | LangGraph — stateful multi-agent graph with conditional routing |
+| **LLM Inference** | Groq (`openai/gpt-oss-120b`) via `langchain-groq` |
+| **Backend** | FastAPI, Pydantic v2, Server-Sent Events for live progress |
+| **Frontend** | React 18, Vite, Tailwind CSS |
+| **Infra output** | Terraform (self-validated HCL) |
+| **Deployment** | Render (backend) · Vercel (frontend) |
+
+---
+
+## Getting started locally
+
+### Backend
+
+```bash
+cd backend
+pip install -r requirements.txt
+cp .env.example .env        # add your GROQ_API_KEY
+python main.py                # → http://localhost:8000
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+cp .env.example .env        # VITE_API_URL=http://localhost:8000
+npm run dev                   # → http://localhost:5173
 ```
 
 ---
@@ -30,110 +140,35 @@ GROQ_API_KEY=your_new_key_here
 ```
 cloudarchitect-ai/
 ├── backend/
-│   ├── agents/                  # 5 standalone agent modules (LLM calls)
-│   ├── orchestration/graph.py   # LangGraph wiring: revision loop + retry loop
+│   ├── agents/                  # 5 standalone, independently-testable agents
+│   ├── orchestration/graph.py   # LangGraph wiring — revision loop + retry loop
 │   ├── schemas/models.py        # single source of truth Pydantic models
-│   ├── tools/terraform_validator.py
-│   ├── main.py                  # FastAPI app (blocking + SSE streaming endpoints)
-│   ├── test_graph_mocked.py     # verifies control flow without calling the LLM
-│   ├── requirements.txt
-│   └── .env                     # GROQ_API_KEY — lives HERE, inside backend/ (gitignored)
+│   ├── tools/                   # Terraform validator, LLM retry handling
+│   └── main.py                  # FastAPI app (blocking + SSE streaming endpoints)
 └── frontend/
-    ├── src/
-    │   ├── App.jsx
-    │   ├── constants.js
-    │   └── components/
-    │       ├── PipelineTrace.jsx   # live animated agent trace
-    │       ├── BriefForm.jsx
-    │       └── ResultsPanels.jsx
-    └── .env                      # VITE_API_URL — lives HERE, inside frontend/ (gitignored)
+    └── src/
+        ├── App.jsx
+        └── components/
+            ├── PipelineTrace.jsx   # live animated agent trace
+            ├── BriefForm.jsx
+            └── ResultsPanels.jsx
 ```
 
-## Run it locally
+---
 
-**Backend**
+## A note on the demo's limits
 
-```bash
-cd backend
-python -m venv venv && source venv/bin/activate      # optional
-pip install -r requirements.txt
-cp .env.example .env                                  # then paste your Groq key in
-python main.py                                        # http://localhost:8000
-```
+This runs on Groq's free tier, which caps total throughput per account (not per user) at 8,000 tokens/minute and 200,000 tokens/day. In practice that means the live demo comfortably handles one person running it at a time, and roughly 8–12 full pipeline runs across *all* visitors per day before the daily quota resets. Complex briefs (multi-region, compliance-heavy, very high traffic) produce larger architectures and are more likely to hit that ceiling than modest ones — the example prompts on the page are chosen to stay well within it.
 
-Sanity-check the graph's control flow **without spending Groq quota**:
+This isn't a bug so much as an honest constraint of building on a free inference tier — flagging it here rather than letting it look like the app is broken.
 
-```bash
-python test_graph_mocked.py
-```
+---
 
-Sanity-check each agent standalone (uses real Groq calls, as before):
+<div align="center">
 
-```bash
-python agents/requirements_analyst.py
-```
+Built by **Chetan Meshram**
 
-**Frontend**
+<!-- Add your links here, e.g.: -->
+<!-- [LinkedIn](your-linkedin-url) · [GitHub](your-github-url) · [Portfolio](your-portfolio-url) -->
 
-```bash
-cd frontend
-npm install
-cp .env.example .env      # VITE_API_URL=http://localhost:8000 for local dev
-npm run dev                # http://localhost:5173
-```
-
-Open `http://localhost:5173`, describe a workload, and watch the trace light up as each
-agent runs. Results land in the tabs on the right as they complete.
-
-## How the pipeline is wired (`orchestration/graph.py`)
-
-- **Revision loop**: if the Reviewer doesn't approve the design, the Architect gets the
-  `required_changes` back and produces a new revision — up to `MAX_ARCHITECTURE_REVISIONS`
-  (default 3), after which the pipeline proceeds with the best attempt so it never stalls.
-- **Terraform retry loop**: if the generated HCL fails `terraform_validator.py`'s checks,
-  DevOps retries — up to `MAX_TERRAFORM_RETRIES` (default 2).
-- Every node reports progress via a callback, which `main.py` turns into Server-Sent Events
-  so the frontend can show live status per agent instead of one long spinner.
-
-## API
-
-- `GET /api/health` — liveness check
-- `POST /api/design` — blocking; runs the full pipeline, returns the final state as JSON
-- `POST /api/design/stream` — SSE; streams `{stage, status, detail}` per agent, then a final
-  `{stage: "pipeline", status: "completed", detail: <full state>}` event
-
-Both accept:
-```json
-{ "prompt": "A highly available video streaming backend", "target_region": "us-east-1", "environment": "prod" }
-```
-
-## Deploying the demo
-
-A simple, free-tier-friendly path:
-
-1. **Backend → Render (or Railway/Fly.io)**
-   - New Web Service from this repo, root directory `backend/`
-   - Build: `pip install -r requirements.txt`
-   - Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-   - Env var: `GROQ_API_KEY`
-   - Note the deployed URL, e.g. `https://cloudarchitect-api.onrender.com`
-
-2. **Frontend → Vercel (or Netlify)**
-   - Import this repo, root directory `frontend/`
-   - Build command: `npm run build`, output dir: `dist`
-   - Env var: `VITE_API_URL=https://cloudarchitect-api.onrender.com`
-
-3. **Lock down CORS**: in `backend/main.py`, change
-   `allow_origins=["*"]` to your actual Vercel URL before sharing the demo publicly —
-   the wildcard is fine for local testing but you don't want a public API open to any origin.
-
-4. Groq's free tier has real rate limits — if the demo gets hammered, requests will 429.
-   Consider a short client-side cooldown on the submit button, or a small in-memory queue,
-   if you expect concurrent visitors during a demo.
-
-## Free-tier gotcha to plan around
-
-Render/Railway free tiers spin down on inactivity — the first request after idling can take
-10–20s to cold-start, which will look like the pipeline is stuck. Worth a "waking up the
-backend…" message client-side, or a paid always-on tier if this is going in front of
-reviewers/recruiters.
+</div>
