@@ -49,6 +49,13 @@ By the end, you have a complete architecture design, an independent WAF review w
 
 <br>
 
+### Full architecture, explained
+*Every service comes with its purpose and which WAF pillar it serves — not just a service list, but the reasoning behind it.*
+
+![Architecture tab showing service-by-service breakdown](./docs/screenshots/03-architecture-design.png)
+
+<br>
+
 ### Independent architecture review
 *The Reviewer doesn't just rubber-stamp the design — it scores all six Well-Architected Framework pillars independently and explains its reasoning.*
 
@@ -56,12 +63,10 @@ By the end, you have a complete architecture design, an independent WAF review w
 
 <br>
 
-### Full architecture, explained
-*Every service comes with its purpose and which WAF pillar it serves — not just a service list, but the reasoning behind it.*
+### Apply-ready Terraform
+*DevOps generates and self-validates complete HCL — every resource tagged and traceable back to the architecture above.*
 
-![Architecture tab showing service-by-service breakdown](./docs/screenshots/03-architecture-design.png)
-
-<br>
+![Terraform tab showing generated HCL and validation status](./docs/screenshots/05-terraform-output.png)
 
 ### Real cost estimates, line by line
 *FinOps breaks down monthly cost per service with the actual pricing assumptions it used — not a single guessed number.*
@@ -70,10 +75,6 @@ By the end, you have a complete architecture design, an independent WAF review w
 
 <br>
 
-### Apply-ready Terraform
-*DevOps generates and self-validates complete HCL — every resource tagged and traceable back to the architecture above.*
-
-![Terraform tab showing generated HCL and validation status](./docs/screenshots/05-terraform-output.png)
 
 </div>
 
