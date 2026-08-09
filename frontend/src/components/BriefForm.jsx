@@ -1,9 +1,10 @@
 import { useState } from "react";
 
 const EXAMPLES = [
-  { text: "An internal analytics dashboard for a 40-person startup, low budget", recommended: true },
-  { text: "A simple REST API backend for a mobile app, moderate traffic, single region" },
-  { text: "A static company website with a contact form, low traffic" },
+  "An internal analytics dashboard for a 40-person startup, low budget",
+  "A video streaming app for a small startup, moderate traffic, single region",
+  "A simple REST API backend for a mobile app, moderate traffic, single region",
+  "A static company website with a contact form, low traffic",
 ];
 
 export default function BriefForm({ onSubmit, disabled }) {
@@ -26,7 +27,7 @@ export default function BriefForm({ onSubmit, disabled }) {
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="e.g. An internal analytics dashboard for a 40-person startup, low budget"
+          placeholder="Describe the workload in plain English — traffic, latency needs, compliance, budget…"
           rows={4}
           disabled={disabled}
           className="w-full bg-blueprint-panel2 border border-blueprint-border rounded-md px-4 py-3 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-cyan/50 focus:border-cyan disabled:opacity-50 resize-none"
@@ -35,17 +36,12 @@ export default function BriefForm({ onSubmit, disabled }) {
           {EXAMPLES.map((ex) => (
             <button
               type="button"
-              key={ex.text}
+              key={ex}
               disabled={disabled}
-              onClick={() => setPrompt(ex.text)}
-              className={`text-xs font-mono rounded px-2 py-1 border transition-colors disabled:opacity-40 ${
-                ex.recommended
-                  ? "text-amber border-amber/50 hover:border-amber bg-amber/5"
-                  : "text-ink-faint border-blueprint-border hover:text-cyan hover:border-cyan/50"
-              }`}
+              onClick={() => setPrompt(ex)}
+              className="text-xs font-mono text-ink-faint hover:text-cyan border border-blueprint-border hover:border-cyan/50 rounded px-2 py-1 transition-colors disabled:opacity-40"
             >
-              {ex.recommended && "✓ "}
-              {ex.text.length > 40 ? ex.text.slice(0, 40) + "…" : ex.text}
+              {ex.length > 40 ? ex.slice(0, 40) + "…" : ex}
             </button>
           ))}
         </div>
